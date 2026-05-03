@@ -1,0 +1,330 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 16,2 );
+#include <DS3231.h>
+#include <Servo.h>
+#include <Keypad.h>
+
+
+const byte ROWS = 4; 
+const byte COLS = 4; 
+
+
+
+
+char hexaKeys[ROWS][COLS] = {
+
+  {'1','2','3','A'},
+
+  {'4','5','6','B'},
+
+  {'7','8','9','C'},
+
+  {'*','0','#','D'}
+
+};
+
+
+
+byte rowPins[ROWS] = {9, 8, 7, 6}; 
+byte colPins[COLS] = {5, 4, 3, 2}; 
+
+Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); 
+
+DS3231  rtc(A4, A5);
+
+Servo servo_test;    
+
+Servo ServoMotor; 
+
+
+  int button = 11; \\ הכפתור מחובר לפין 11
+
+
+boolean feed = true;\\משתנה שווה לנכון
+boolean feed2 = true ;\\משתנה שווה לנכון
+boolean feed3 = true ;\\משתנה שווה לנכון
+
+ int t1, t2, t3, t4,t5,t6;\\קליטת משתנים
+ int r[6];\\קליטת מערך
+  char key;\\קליטת משתנה
+
+int z1, z2, z3, z4,z5,z6;\\קליטת משתנים
+ int x[6];\\קליטת מערך
+
+
+
+  int a1, a2, a3, a4,a5,a6;\\ קליטת משתנים
+ int o[6];\\ קליטת מערך
+
+
+
+ void setup() 
+ { 
+
+
+  rtc.begin();
+  rtc.setTime(12, 30, 0);    \\קביעת השעה ההתחלתית
+  rtc.setDate(2, 12, 2020); \\קביעת התאריך ההתחלתי
+
+  
+lcd.init();//בשביל הLCD
+lcd.backlight();
+
+
+ServoMotor.attach(10); // מנוע סרוו מחובר לפין 10
+ 
+
+ pinMode(button, INPUT);//מסמנים שהכפתור הוא קלט
+
+ }
+
+
+
+
+void setFeedingTime(){ \\יצירת פונקציה חדשה
+  char j=0; \\ קביעת משתנה  ששוה ל0
+  feed = true; \\מסמנים את המשתנה לנכון
+   int i=0; \\קביעת משתנה שווה ל0
+      lcd.clear(); \\מנקה את הלוח של הLCD
+      delay(400);\\לזמן של 4 מילי שניות
+  lcd.setCursor(0,0); \\ מסמן את המקום ההתחלתי
+  lcd.print("Set feeding Time");\\ כותב על הלוח את מה שבסוגריים
+  
+  while(1){ \\ לולאה שחוזרת על עצמה עד שפקודת BREAK
+
+      key = customKeypad.getKey(); \\קביעת המשתנים בעזרת הלחצנים
+     
+
+  if(key!=NO_KEY){ \\אם לחצו עם הלוח מקשים
+      lcd.setCursor(j,1); מסמנים את המקום ההתחלתי
+      lcd.print(key);\\ פולט ללוח את מה שלחצנו
+      r[i] = key-48; \\קביעת המשתנה לפי מה שלחצנו על הלוח ושם את המספר לפי קוד אסקי
+      i++; \\מגדיל את המשתנה ב-1
+      delay(500);\\לזמן של 5 מילי שניה
+      j++; \\מגדיל את השתנה ב-1
+    }
+         if (j== 2) \\ אם המשתנה שווה ל2
+          {
+            lcd.print(':');\\זה פולט ללוח את מה שבסוגריים
+            j++; \\מגדיל את  המשתנה ב-1
+           }
+  if (key == 'D'); \\אם המשתנה שווה למה שבסוגריים
+  {
+    key=0; \\ אז המשתנה שווה ל0
+
+    break; \\ ויוצאים מהלולאה
+    }
+            if(key == '*')\\אם המשתנה שווה למה שבסוגריים 
+         {
+           break;\\void אז יוצאים מה
+         }
+
+  }
+ 
+  }
+
+
+
+void setFeedingTime2(){ \\יצירת פונקציה חדשה כמו הפונקציה הקודמת
+       char j=0;
+feed2 =  true;
+   int p=0;
+
+          lcd.clear();
+          delay(400);
+  lcd.setCursor(0,0);
+  lcd.print("Set feeding Time");
+  
+  while(1){
+
+      key = customKeypad.getKey();
+
+
+  if(key!=NO_KEY){
+      lcd.setCursor(j,1);
+      lcd.print(key);
+      x[p] = key-48;
+      p++;
+      delay(500);
+      j++;
+    }
+         if (j== 2)
+          {
+            lcd.print(':');
+            j++;
+           }
+  if (key == 'D')
+  {
+    key=0; 
+    break; 
+    }
+         if(key == '*')
+         {
+           break;
+         }
+  }
+  
+}
+
+
+
+
+void setFeedingTime3(){\\ יצירת פונקציה חדשה כמו הפונקציה הקודמת
+       char j=0;
+feed3 = true;
+   int c=0;
+
+        lcd.clear();
+        delay(400);
+  lcd.setCursor(0,0);
+  lcd.print("Set feeding Time");
+  
+  while(1){
+    
+        key = customKeypad.getKey();
+    
+  if(key!=NO_KEY){
+      lcd.setCursor(j,1);
+      lcd.print(key);
+      o[c] = key-48;
+      c++;
+      delay(500);
+      j++;
+    }
+         if (j== 2)
+          {
+            lcd.print(':');
+            j++;
+           }
+  if (key == 'D')
+  {
+    key=0; 
+    break; 
+    }
+         if(key == '*')
+         {
+           break;
+         }
+  }
+}
+
+
+
+
+void loop() {
+  Serial.begin(400);
+ServoMotor.write(80);   
+
+  
+lcd.print("Time:   "); \\כותב בלוח את מה שבסוגריים
+   lcd.print(rtc.getTimeStr());\\כותב בלוח את השעה
+ lcd.setCursor(0,1);\\מסמן את המיקום על הלוח
+ lcd.print("Date: ");\\כותב בלוח מה שבסוגריים
+ lcd.print(rtc.getDateStr());\\כותב את התאריך
+  lcd.setCursor(0,0);\\מסמן את המיקום על הלוח
+  delay(400);\\לזמן של 4 מילי שניה
+
+ 
+
+
+
+ 
+ String t = ""; \\קולט את המשתנים לפי קוד אסקי
+ t = rtc.getTimeStr(); 
+ t1 = t.charAt(0)-48;
+ t2 = t.charAt(1)-48;
+ t3 = t.charAt(3)-48;
+ t4 = t.charAt(4)-48;
+ t5 = t.charAt(6)-48;
+ t6 = t.charAt(7)-48;
+
+ 
+  String z = "";\\ קולט את המשתנים לפי קוד אסקי
+ z = rtc.getTimeStr(); 
+ z1 = z.charAt(0)-48;
+ z2 = z.charAt(1)-48;
+ z3 = z.charAt(3)-48;
+ z4 = z.charAt(4)-48;
+ z5 = z.charAt(6)-48;
+ z6 = z.charAt(7)-48;
+
+
+
+
+ String a = ""; \\ קולט את המשתנים לפי קוד אסקי
+ a = rtc.getTimeStr(); 
+ a1 = a.charAt(0)-48;
+ a2 = a.charAt(1)-48;
+ a3 = a.charAt(3)-48;
+ a4 = a.charAt(4)-48;
+ a5 = a.charAt(6)-48;
+ a6 = a.charAt(7)-48;
+
+ if(digitalRead(button) == LOW){\\אם לוחצים על הכפתור
+
+ lcd.clear();\\מנקה את הלוח 
+  lcd.setCursor(0,0);\\מסמן את המיקום על הלוח
+  lcd.print("Set feed program");\\כותב על הלוח את מה שבסוגריים
+ 
+while(1){ \\לולאה שחוזרת על עצמה עד פקודת BREAK
+ key = customKeypad.getKey();\\קביעת המשתנים עם הלחצן
+
+if(key == 'A')\\ אם לחצו על A
+{
+ setFeedingTime();\\ זה עובר ללולאה שכתובה 
+ }     
+ 
+if(key == 'C')\\ אם לחצו עם C
+{
+  setFeedingTime2();\\זה עובר ללולאה שכתובה
+}
+
+if(key == 'B')\\אם לחצו על B 
+{
+  setFeedingTime3();\\זה עובר ללולאה שכתובה
+  }
+  
+   if(key == '*')\\ אם לחצו על *
+{
+  break; \\זה יוצא מהלולאה
+}  
+ }
+ }
+
+
+
+
+
+
+
+
+ if (t1==r[0] && t2==r[1] && t3==r[2] && t4==r[3] &&  t5<1 && t6<3 && feed==true)\\אם כל הדברים האלה מתקיימים
+ { 
+ ServoMotor.write(125);          \\המנוע מסתובב ל125 מעלות
+   delay(3000);   \\לזמן של 3 שניות
+ServoMotor.write(80); \\המנוע מסתובב ל80 מעלות
+delay(1000);\\לזמן של שניה
+  feed=false; \\המשתנה משתנה ללא נכון
+ }
+
+ if (z1==x[0] && z2==x[1] && z3==x[2] && z4==x[3] &&  z5<1 &&z6<3&&feed2==true) \\אם כל הדברים האלה מתקיימים
+ { 
+ ServoMotor.write(125);             \\המנוע מסתובב ל125 מעלות    
+   delay(3000);   \\לזמן של 3 שניות
+ServoMotor.write(80); \\המנוע מסתובב ל80 מעלות
+delay(1000);\\לזמן של שניה
+  feed2=false; \\המשתנה משתנה ללא נכון
+ }
+
+
+ if (a1==o[0] && a2==o[1] && a3==o[2] && a4==o[3] && a5<1&&a6<3&&feed3==true)
+\\אם כל הדברים האלה מתקיימים
+ { 
+ ServoMotor.write(125);            \\המנוע מסתובב ל125 מעלות     
+   delay(3000);   \\לזמן של 3 שניות
+ServoMotor.write(80); \\המונע מסובב ל80 מעלות
+delay(1000);\\ לזמן של שניה
+  feed3=false;\\המשתנה משתנה ללא נכון
+ }
+}
